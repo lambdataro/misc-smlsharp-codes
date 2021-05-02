@@ -6,7 +6,7 @@
 
 - [x] 第1章 1.7 練習問題 (`./firstSMLSharp`)
 - [x] 第2章 2.6 練習問題 (`./InterfacePrint`, `functionTest`)
-- [ ] 第3章 3.5 練習問題
+- [x] 第3章 3.5 練習問題 (`./listFunctions`)
 - [ ] 第4章 4.4 練習問題
 - [ ] 第5章 5.5 練習問題
 - [ ] 第6章 6.4 発展課題
