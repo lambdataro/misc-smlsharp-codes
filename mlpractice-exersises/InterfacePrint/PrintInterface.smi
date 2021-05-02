@@ -1,0 +1,6 @@
+_require "basis.smi"
+structure PrintInterface =
+struct
+  val makePrintString : string -> string
+  val execPrint : string -> unit
+end
