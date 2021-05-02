@@ -1,0 +1,3 @@
+_require "basis.smi"
+_require "./Libs.smi"
+_require "./PrintInterface.smi"

@@ -1,0 +1,4 @@
+structure Libs =
+struct
+  val libs : string list
+end
