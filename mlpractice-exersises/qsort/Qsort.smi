@@ -1,0 +1,8 @@
+_require "basis.smi"
+_require "ffi.smi"
+
+structure Qsort =
+struct
+  val qsort : ['a#unboxed. 'a array * ('a ptr * 'a ptr -> int) -> unit]
+  val quickSort : ['a#unboxed. 'a array * ('a * 'a -> order) -> unit]
+end
