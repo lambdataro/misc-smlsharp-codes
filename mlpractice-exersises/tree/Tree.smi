@@ -1,0 +1,14 @@
+_require "basis.smi"
+
+structure Tree =
+struct
+  datatype 'a tree
+    = EmptyTree
+    | Node of 'a * 'a tree * 'a tree
+
+  val height : ['a. 'a tree -> int]
+  val size : ['a. 'a tree -> int]
+  val sum : int tree -> int
+  val traverse : ['a. 'a tree -> 'a list]
+  val mkTree : int -> int tree
+end
