@@ -4,4 +4,4 @@
 - `Update`: 累積陽性者の取得
 - `Analyze`: 累積陽性者割合の計算
 - `Main`: `Setup`, `Update`, `Analyze` を順番に実行
-- `SelectPrefTest`: 人口500万人以上の都道府県の累積陽性者割合の計算
+- `SelectPrefTest`: 人口が全国平均以上の都道府県の累積陽性者割合の計算
