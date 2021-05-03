@@ -1,0 +1,4 @@
+_require "sql.smi"
+_require "reify.smi"
+_require "./AnalyzeDB.smi"
+_require "./DBSchema.smi"
