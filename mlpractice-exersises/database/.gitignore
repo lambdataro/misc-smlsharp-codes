@@ -1,0 +1,7 @@
+*.o
+*.log
+Main
+Setup
+Update
+Analyze
+SelectPrefTest
