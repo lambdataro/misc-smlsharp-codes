@@ -1,0 +1,7 @@
+_require "basis.smi"
+_require "reify.smi"
+
+structure JSONImport =
+struct
+  val import : ['a#reify, 'b#{url: string, sample: 'a}. 'b -> 'a]
+end

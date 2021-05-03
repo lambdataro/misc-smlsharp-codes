@@ -1,0 +1,9 @@
+_require "basis.smi"
+
+structure ReadIntStream =
+struct
+  val readBinStream : string -> int list
+  val readDecStream : string -> int list
+  val readOctStream : string -> int list
+  val readHexStream : string -> int list
+end
