@@ -1,0 +1,100 @@
+_require "basis.smi"
+_require "ffi.smi"
+
+structure SDL2 =
+struct
+  (* SDLの例外 *)
+  exception SDL_Error of string
+
+  (* SDL_GetError *)
+  val SDL_GetError : unit -> string
+
+  (* SDL_Init *)
+  datatype SDL_InitFlags =
+      SDL_INIT_TIMER
+    | SDL_INIT_AUDIO
+    | SDL_INIT_VIDEO
+    | SDL_INIT_JOYSTICK
+    | SDL_INIT_HAPTIC
+    | SDL_INIT_GAMECONTROLLER
+    | SDL_INIT_EVENTS
+    | SDL_INIT_SENSOR
+    | SDL_INIT_NOPARACHUTE
+    | SDL_INIT_EVERYTHING
+
+  val SDL_Init : SDL_InitFlags list -> unit
+
+  (* SDL_Log *)
+  val SDL_Log : string -> unit
+  val SDL_Log1 : ['a#boxed. string * 'a -> unit]
+  val SDL_Log2 : ['a#boxed, 'b#boxed. string * 'a * 'b -> unit]
+  val SDL_Log3 : ['a#boxed, 'b#boxed, 'c#boxed. string * 'a * 'b * 'c -> unit]
+
+  (* SDL_Quit *)
+  val SDL_Quit : unit -> unit
+
+  (* SDL_Window *)
+  type SDL_Window (= ptr)
+
+  (* SDL_CreateWindow *)
+  datatype SDL_WindowFlags =
+      SDL_WINDOW_FULLSCREEN
+    | SDL_WINDOW_OPENGL
+    | SDL_WINDOW_SHOWN
+    | SDL_WINDOW_HIDDEN
+    | SDL_WINDOW_BORDERLESS
+    | SDL_WINDOW_RESIZABLE
+    | SDL_WINDOW_MINIMIZED
+    | SDL_WINDOW_MAXIMIZED
+    | SDL_WINDOW_INPUT_GRABBED
+    | SDL_WINDOW_INPUT_FOCUS
+    | SDL_WINDOW_MOUSE_FOCUS
+    | SDL_WINDOW_FULLSCREEN_DESKTOP
+    | SDL_WINDOW_FOREIGN
+    | SDL_WINDOW_ALLOW_HIGHDPI
+    | SDL_WINDOW_MOUSE_CAPTURE
+    | SDL_WINDOW_ALWAYS_ON_TOP
+    | SDL_WINDOW_SKIP_TASKBAR
+    | SDL_WINDOW_UTILITY
+    | SDL_WINDOW_TOOLTIP
+    | SDL_WINDOW_POPUP_MENU
+    | SDL_WINDOW_VULKAN
+    | SDL_WINDOW_METAL
+
+  val SDL_WINDOWPOS_UNDEFINED : int
+  val SDL_WINDOWPOS_CENTERED : int
+
+  val SDL_CreateWindow : string * int * int * int * int * SDL_WindowFlags list -> SDL_Window
+
+  (* SDL_DestroyWindow *)
+  val SDL_DestroyWindow : SDL_Window -> unit
+
+  (* SDL_Delay *)
+  val SDL_Delay : word32 -> unit
+
+  (* SDL_Surface *)
+  type SDL_Surface (= ptr)
+  type SDL_PixelFormat (= ptr)
+  val SDL_Surface_GetFormat : SDL_Surface -> SDL_PixelFormat
+
+  (* SDL_GetWindowSurface *)
+  val SDL_GetWindowSurface : SDL_Window -> SDL_Surface
+
+  (* SDL_Rect *)
+  type SDL_Rect =
+    {
+      x: int,
+      y: int,
+      w: int,
+      h: int
+    }
+
+  (* SDL_FillRect *)
+  val SDL_FillRect : SDL_Surface * SDL_Rect option * word32 -> unit
+
+  (* SDL_UpdateWindowSurface *)
+  val SDL_UpdateWindowSurface : SDL_Window -> unit
+
+  (* SDL_MapRGB *)
+  val SDL_MapRGB : SDL_PixelFormat * word8 * word8 * word8 -> word32
+end
