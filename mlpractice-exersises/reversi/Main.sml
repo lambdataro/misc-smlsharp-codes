@@ -15,7 +15,7 @@ struct
 
   fun rowToString board possible y =
     Int.toString y
-    ^ "|"
+    ^ " "
     ^ String.concat
       (List.tabulate 
         (
@@ -44,16 +44,24 @@ struct
   fun mainLoop game =
     (
       print (gameToString game);
-      case readPos () of
-        NONE => ()
-      | SOME pos =>
-        case Game.step game pos of
-          NONE =>
-            (
-              print "不正な入力\n";
-              mainLoop game
-            )
-        | SOME game => mainLoop game
+      let
+        val pos =
+          case #next game of
+            NONE => NONE
+          | SOME Game.WHITE => SOME (Cpu.cpuNext (#board game) Game.WHITE)
+          | SOME Game.BLACK => readPos ()
+      in
+        case pos of
+          NONE => ()
+        | SOME pos =>
+          case Game.step game pos of
+            NONE =>
+              (
+                print "不正な入力\n";
+                mainLoop game
+              )
+          | SOME game => mainLoop game
+      end
     )
 end
 
