@@ -97,4 +97,79 @@ struct
 
   (* SDL_MapRGB *)
   val SDL_MapRGB : SDL_PixelFormat * word8 * word8 * word8 -> word32
+
+  (* SDL_Event *)
+  datatype SDL_Event =
+      SDL_QUIT
+    (* iOS evnets *)
+    | SDL_APP_TERMINATING
+    | SDL_APP_LOWMEMORY
+    | SDL_APP_WILLENTERBACKGROUND
+    | SDL_APP_DIDENTERBACKGROUND
+    | SDL_APP_WILLENTERFOREGROUND
+    | SDL_APP_DIDENTERFOREGROUND
+    | SDL_LOCALECHANGED
+    (* Display events *)
+    | SDL_DISPLAYEVENT
+    (* Window events *)
+    | SDL_WINDOWEVENT
+    | SDL_SYSWMEVENT
+    (* Keyboard events *)
+    | SDL_KEYDOWN
+    | SDL_KEYUP
+    | SDL_TEXTEDITING
+    | SDL_TEXTINPUT
+    | SDL_KEYMAPCHANGED
+    (* Mouse events *)
+    | SDL_MOUSEMOTION
+    | SDL_MOUSEBUTTONDOWN
+    | SDL_MOUSEBUTTONUP
+    | SDL_MOUSEWHEEL
+    (* Joystick events *)
+    | SDL_JOYAXISMOTION
+    | SDL_JOYBALLMOTION
+    | SDL_JOYHATMOTION
+    | SDL_JOYBUTTONDOWN
+    | SDL_JOYBUTTONUP
+    | SDL_JOYDEVICEADDED
+    | SDL_JOYDEVICEREMOVED
+    (* Game controller events *)
+    | SDL_CONTROLLERAXISMOTION
+    | SDL_CONTROLLERBUTTONDOWN
+    | SDL_CONTROLLERBUTTONUP
+    | SDL_CONTROLLERDEVICEADDED
+    | SDL_CONTROLLERDEVICEREMOVED
+    | SDL_CONTROLLERDEVICEREMAPPED
+    | SDL_CONTROLLERTOUCHPADDOWN
+    | SDL_CONTROLLERTOUCHPADMOTION
+    | SDL_CONTROLLERTOUCHPADUP
+    | SDL_CONTROLLERSENSORUPDATE
+    (* Touch events *)
+    | SDL_FINGERDOWN
+    | SDL_FINGERUP
+    | SDL_FINGERMOTION
+    (* Gesture events *)
+    | SDL_DOLLARGESTURE
+    | SDL_DOLLARRECORD
+    | SDL_MULTIGESTURE
+    (* Clipboard events *)
+    | SDL_CLIPBOARDUPDATE
+    (* Drag and drop events *)
+    | SDL_DROPFILE
+    | SDL_DROPTEXT
+    | SDL_DROPBEGIN
+    | SDL_DROPCOMPLETE
+    (* Audio hotplug events *)
+    | SDL_AUDIODEVICEADDED
+    | SDL_AUDIODEVICEREMOVED
+    (* Sensor events *)
+    | SDL_SENSORUPDATE
+    (* Render events *)
+    | SDL_RENDER_TARGETS_RESET
+    | SDL_RENDER_DEVICE_RESET
+    (* User event *)
+    | SDL_USEREVENT
+
+  (* PollEvent *)
+  val SDL_PollEvent : unit -> SDL_Event option
 end

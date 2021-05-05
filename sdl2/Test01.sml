@@ -44,6 +44,12 @@ val _ =SDL2.SDL_FillRect (surface, NONE, color)
 
 val _ = SDL2.SDL_UpdateWindowSurface window
 
-(* 一定時間待って終了 *)
+(* イベントループ *)
 
-val _ = SDL2.SDL_Delay 0w2000
+fun eventLoop () =
+  case SDL2.SDL_PollEvent () of
+    SOME SDL2.SDL_QUIT => ()
+  | _ => eventLoop ()
+
+
+val _ = eventLoop ()

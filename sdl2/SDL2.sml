@@ -195,4 +195,169 @@ struct
   (* SDL_MapRGB *)
   val SDL_MapRGB = _import "SDL_MapRGB" : (SDL_PixelFormat, word8, word8, word8) -> word32
 
+  (* SDL_Event *)
+  type SDL_Event_c = unit ptr
+  val stub_DestroyEvent = _import "stub_DestroyEvent" : SDL_Event_c -> ()
+  val SDL_Event_GetType = _import "SDL_Event_GetType" : SDL_Event_c -> int
+
+  datatype SDL_Event =
+      SDL_QUIT
+    (* iOS evnets *)
+    | SDL_APP_TERMINATING
+    | SDL_APP_LOWMEMORY
+    | SDL_APP_WILLENTERBACKGROUND
+    | SDL_APP_DIDENTERBACKGROUND
+    | SDL_APP_WILLENTERFOREGROUND
+    | SDL_APP_DIDENTERFOREGROUND
+    | SDL_LOCALECHANGED
+    (* Display events *)
+    | SDL_DISPLAYEVENT
+    (* Window events *)
+    | SDL_WINDOWEVENT
+    | SDL_SYSWMEVENT
+    (* Keyboard events *)
+    | SDL_KEYDOWN
+    | SDL_KEYUP
+    | SDL_TEXTEDITING
+    | SDL_TEXTINPUT
+    | SDL_KEYMAPCHANGED
+    (* Mouse events *)
+    | SDL_MOUSEMOTION
+    | SDL_MOUSEBUTTONDOWN
+    | SDL_MOUSEBUTTONUP
+    | SDL_MOUSEWHEEL
+    (* Joystick events *)
+    | SDL_JOYAXISMOTION
+    | SDL_JOYBALLMOTION
+    | SDL_JOYHATMOTION
+    | SDL_JOYBUTTONDOWN
+    | SDL_JOYBUTTONUP
+    | SDL_JOYDEVICEADDED
+    | SDL_JOYDEVICEREMOVED
+    (* Game controller events *)
+    | SDL_CONTROLLERAXISMOTION
+    | SDL_CONTROLLERBUTTONDOWN
+    | SDL_CONTROLLERBUTTONUP
+    | SDL_CONTROLLERDEVICEADDED
+    | SDL_CONTROLLERDEVICEREMOVED
+    | SDL_CONTROLLERDEVICEREMAPPED
+    | SDL_CONTROLLERTOUCHPADDOWN
+    | SDL_CONTROLLERTOUCHPADMOTION
+    | SDL_CONTROLLERTOUCHPADUP
+    | SDL_CONTROLLERSENSORUPDATE
+    (* Touch events *)
+    | SDL_FINGERDOWN
+    | SDL_FINGERUP
+    | SDL_FINGERMOTION
+    (* Gesture events *)
+    | SDL_DOLLARGESTURE
+    | SDL_DOLLARRECORD
+    | SDL_MULTIGESTURE
+    (* Clipboard events *)
+    | SDL_CLIPBOARDUPDATE
+    (* Drag and drop events *)
+    | SDL_DROPFILE
+    | SDL_DROPTEXT
+    | SDL_DROPBEGIN
+    | SDL_DROPCOMPLETE
+    (* Audio hotplug events *)
+    | SDL_AUDIODEVICEADDED
+    | SDL_AUDIODEVICEREMOVED
+    (* Sensor events *)
+    | SDL_SENSORUPDATE
+    (* Render events *)
+    | SDL_RENDER_TARGETS_RESET
+    | SDL_RENDER_DEVICE_RESET
+    (* User event *)
+    | SDL_USEREVENT
+
+  (* SDL_PollEvent *)
+  val stub_SDL_PollEvent = _import "stub_SDL_PollEvent" : () -> SDL_Event_c
+  fun SDL_PollEvent () =
+    let
+      val event_c = stub_SDL_PollEvent ()
+    in
+      if Pointer.isNull event_c
+      then NONE
+      else
+        let
+          val event =
+            case SDL_Event_GetType event_c of
+                256 => SDL_QUIT
+              (* iOS evnets *)
+              | 257 => SDL_APP_TERMINATING
+              | 258 => SDL_APP_LOWMEMORY
+              | 259 => SDL_APP_WILLENTERBACKGROUND
+              | 260 => SDL_APP_DIDENTERBACKGROUND
+              | 261 => SDL_APP_WILLENTERFOREGROUND
+              | 262 => SDL_APP_DIDENTERFOREGROUND
+              | 263 => SDL_LOCALECHANGED
+              (* Display events *)
+              | 336 => SDL_DISPLAYEVENT
+              (* Window events *)
+              | 512 => SDL_WINDOWEVENT
+              | 513 => SDL_SYSWMEVENT
+              (* Keyboard events *)
+              | 768 => SDL_KEYDOWN
+              | 769 => SDL_KEYUP
+              | 770 => SDL_TEXTEDITING
+              | 771 => SDL_TEXTINPUT
+              | 772 => SDL_KEYMAPCHANGED
+              (* Mouse events *)
+              | 1024 => SDL_MOUSEMOTION
+              | 1025 => SDL_MOUSEBUTTONDOWN
+              | 1026 => SDL_MOUSEBUTTONUP
+              | 1027 => SDL_MOUSEWHEEL
+              (* Joystick events *)
+              | 1536 => SDL_JOYAXISMOTION
+              | 1537 => SDL_JOYBALLMOTION
+              | 1538 => SDL_JOYHATMOTION
+              | 1539 => SDL_JOYBUTTONDOWN
+              | 1540 => SDL_JOYBUTTONUP
+              | 1541 => SDL_JOYDEVICEADDED
+              | 1542 => SDL_JOYDEVICEREMOVED
+              (* Game controller events *)
+              | 1616 => SDL_CONTROLLERAXISMOTION
+              | 1617 => SDL_CONTROLLERBUTTONDOWN
+              | 1618 => SDL_CONTROLLERBUTTONUP
+              | 1619 => SDL_CONTROLLERDEVICEADDED
+              | 1620 => SDL_CONTROLLERDEVICEREMOVED
+              | 1621 => SDL_CONTROLLERDEVICEREMAPPED
+              | 1622 => SDL_CONTROLLERTOUCHPADDOWN
+              | 1623 => SDL_CONTROLLERTOUCHPADMOTION
+              | 1624 => SDL_CONTROLLERTOUCHPADUP
+              | 1625 => SDL_CONTROLLERSENSORUPDATE
+              (* Touch events *)
+              | 1792 => SDL_FINGERDOWN
+              | 1793 => SDL_FINGERUP
+              | 1794 => SDL_FINGERMOTION
+              (* Gesture events *)
+              | 2048 => SDL_DOLLARGESTURE
+              | 2049 => SDL_DOLLARRECORD
+              | 2050 => SDL_MULTIGESTURE
+              (* Clipboard events *)
+              | 2304 => SDL_CLIPBOARDUPDATE
+              (* Drag and drop events *)
+              | 4096 => SDL_DROPFILE
+              | 4097 => SDL_DROPTEXT
+              | 4098 => SDL_DROPBEGIN
+              | 4099 => SDL_DROPCOMPLETE
+              (* Audio hotplug events *)
+              | 4352 => SDL_AUDIODEVICEADDED
+              | 4353 => SDL_AUDIODEVICEREMOVED
+              (* Sensor events *)
+              | 4608 => SDL_SENSORUPDATE
+              (* Render events *)
+              | 8192 => SDL_RENDER_TARGETS_RESET
+              | 8193 => SDL_RENDER_DEVICE_RESET
+              (* User event *)
+              | 32768 => SDL_USEREVENT
+              (* otherwise *)
+              | _ =>
+                raise (SDL_Error "unknown SDL event")
+          val _ = stub_DestroyEvent event_c
+        in
+          SOME event
+        end
+    end
 end
