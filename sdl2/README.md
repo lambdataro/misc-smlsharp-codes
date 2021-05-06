@@ -17,3 +17,9 @@ Rendererを使って描画する。
 マウスのドラッグで線を描く。
 
 ![Test03 Capture](img/Test03_capture.png)
+
+## Test04
+
+SDL_ttfを使って文字列を描く。
+
+![Test04 Capture](img/Test04_capture.png)
