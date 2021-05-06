@@ -5,3 +5,9 @@
 単色で塗りつぶしたウインドウを表示する。
 
 ![Test01 Capture](img/Test01_capture.png)
+
+## Test02
+
+Rendererを使って描画する。
+
+![Test02 Capture](img/Test02_capture.png)
