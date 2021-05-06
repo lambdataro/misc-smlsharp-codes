@@ -200,6 +200,33 @@ struct
   val stub_DestroyEvent = _import "stub_DestroyEvent" : SDL_Event_c -> ()
   val SDL_Event_GetType = _import "SDL_Event_GetType" : SDL_Event_c -> int
 
+  datatype SDL_MouseButtonIndex =
+      SDL_BUTTON_LEFT
+    | SDL_BUTTON_MIDDLE
+    | SDL_BUTTON_RIGHT
+    | SDL_BUTTON_X1
+    | SDL_BUTTON_X2
+
+  type SDL_MouseMotionEvent =
+    {
+      x: int,
+      y: int
+    }
+
+  val stub_SDL_MouseMotionEvent_GetX = _import "SDL_MouseMotionEvent_GetX" : SDL_Event_c -> int
+  val stub_SDL_MouseMotionEvent_GetY = _import "SDL_MouseMotionEvent_GetY" : SDL_Event_c -> int
+
+  type SDL_MouseButtonEvent =
+    {
+      button: SDL_MouseButtonIndex,
+      x: int,
+      y: int
+    }
+  
+  val stub_SDL_MouseButtonEvent_GetX = _import "SDL_MouseButtonEvent_GetX" : SDL_Event_c -> int
+  val stub_SDL_MouseButtonEvent_GetY = _import "SDL_MouseButtonEvent_GetY" : SDL_Event_c -> int
+  val stub_SDL_MouseButtonEvent_GetButton = _import "SDL_MouseButtonEvent_GetButton" : SDL_Event_c -> int
+ 
   datatype SDL_Event =
       SDL_QUIT
     (* iOS evnets *)
@@ -222,9 +249,9 @@ struct
     | SDL_TEXTINPUT
     | SDL_KEYMAPCHANGED
     (* Mouse events *)
-    | SDL_MOUSEMOTION
-    | SDL_MOUSEBUTTONDOWN
-    | SDL_MOUSEBUTTONUP
+    | SDL_MOUSEMOTION of SDL_MouseMotionEvent
+    | SDL_MOUSEBUTTONDOWN of SDL_MouseButtonEvent
+    | SDL_MOUSEBUTTONUP of SDL_MouseButtonEvent
     | SDL_MOUSEWHEEL
     (* Joystick events *)
     | SDL_JOYAXISMOTION
@@ -305,8 +332,32 @@ struct
               | 772 => SDL_KEYMAPCHANGED
               (* Mouse events *)
               | 1024 => SDL_MOUSEMOTION
+                {
+                  x = stub_SDL_MouseMotionEvent_GetX event_c,
+                  y = stub_SDL_MouseMotionEvent_GetY event_c
+                }
               | 1025 => SDL_MOUSEBUTTONDOWN
+                {
+                  button = case stub_SDL_MouseButtonEvent_GetButton event_c of
+                      1 => SDL_BUTTON_LEFT
+                    | 2 => SDL_BUTTON_MIDDLE
+                    | 3 => SDL_BUTTON_RIGHT
+                    | 4 => SDL_BUTTON_X1
+                    | _ => SDL_BUTTON_X2,
+                  x = stub_SDL_MouseButtonEvent_GetX event_c,
+                  y = stub_SDL_MouseButtonEvent_GetY event_c
+                }
               | 1026 => SDL_MOUSEBUTTONUP
+                {
+                  button = case stub_SDL_MouseButtonEvent_GetButton event_c of
+                      1 => SDL_BUTTON_LEFT
+                    | 2 => SDL_BUTTON_MIDDLE
+                    | 3 => SDL_BUTTON_RIGHT
+                    | 4 => SDL_BUTTON_X1
+                    | _ => SDL_BUTTON_X2,
+                  x = stub_SDL_MouseButtonEvent_GetX event_c,
+                  y = stub_SDL_MouseButtonEvent_GetY event_c
+                }
               | 1027 => SDL_MOUSEWHEEL
               (* Joystick events *)
               | 1536 => SDL_JOYAXISMOTION
