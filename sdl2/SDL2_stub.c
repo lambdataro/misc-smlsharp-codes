@@ -39,3 +39,23 @@ void stub_DestroyEvent(SDL_Event *event) {
 int SDL_Event_GetType(SDL_Event *event) {
   return event->type;
 }
+
+int SDL_MouseMotionEvent_GetX(SDL_Event *event) {
+  return event->motion.x;
+}
+
+int SDL_MouseMotionEvent_GetY(SDL_Event *event) {
+  return event->motion.y;
+}
+
+int SDL_MouseButtonEvent_GetX(SDL_Event *event) {
+  return event->button.x;
+}
+
+int SDL_MouseButtonEvent_GetY(SDL_Event *event) {
+  return event->button.y;
+}
+
+int SDL_MouseButtonEvent_GetButton(SDL_Event *event) {
+  return event->button.button;
+}

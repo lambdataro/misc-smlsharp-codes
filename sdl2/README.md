@@ -11,3 +11,9 @@
 Rendererを使って描画する。
 
 ![Test02 Capture](img/Test02_capture.png)
+
+## Test03
+
+マウスのドラッグで線を描く。
+
+![Test03 Capture](img/Test03_capture.png)
