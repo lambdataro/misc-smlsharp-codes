@@ -172,4 +172,44 @@ struct
 
   (* PollEvent *)
   val SDL_PollEvent : unit -> SDL_Event option
+
+  (* SDL_Renderer *)
+  type SDL_Renderer (= ptr)
+
+  (* SDL_RendererFlags *)
+  datatype SDL_RendererFlags =
+      SDL_RENDERER_SOFTWARE
+    | SDL_RENDERER_ACCELERATED
+    | SDL_RENDERER_PRESENTVSYNC
+    | SDL_RENDERER_TARGETTEXTURE
+
+  (* SDL_CreateRenderer *)
+  val SDL_CreateRenderer : SDL_Window * int * SDL_RendererFlags list -> SDL_Renderer
+
+  (* SDL_GetRenderer *)
+  val SDL_GetRenderer : SDL_Window -> SDL_Renderer
+
+  (* SDL_DestroyRenderer *)
+  val SDL_DestroyRenderer : SDL_Renderer -> unit
+
+  (* SDL_SetRenderDrawColor *)
+  val SDL_SetRenderDrawColor : SDL_Renderer * word8 * word8 * word8 * word8 -> unit
+
+  (* SDL_RenderClear *)
+  val SDL_RenderClear : SDL_Renderer -> unit
+
+  (* SDL_RenderPresent *)
+  val SDL_RenderPresent : SDL_Renderer -> unit
+
+  (* SDL_RenderDrawRect *)
+  val SDL_RenderDrawRect : SDL_Renderer * SDL_Rect option -> unit
+
+  (* SDL_RenderFillRect *)
+  val SDL_RenderFillRect : SDL_Renderer * SDL_Rect option -> unit
+
+  (* SDL_RenderDrawLine *)
+  val SDL_RenderDrawLine : SDL_Renderer * int * int * int * int -> unit
+
+  (* SDL_RenderDrawPoint *)
+  val SDL_RenderDrawPoint : SDL_Renderer * int * int -> unit
 end
