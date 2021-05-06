@@ -1,0 +1,13 @@
+_require "basis.smi"
+_require "ffi.smi"
+_require "./SDL2.smi"
+
+structure SDL2_ttf =
+struct
+  val TTF_Init : unit -> unit
+  val TTF_Quit : unit -> unit
+  type TTF_Font (= ptr)
+  val TTF_OpenFont : string * int -> TTF_Font
+  val TTF_CloseFont : TTF_Font -> unit
+  val TTF_RenderUTF8_Solid : TTF_Font * string * SDL2.SDL_Color -> SDL2.SDL_Surface
+end

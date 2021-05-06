@@ -73,12 +73,15 @@ struct
   val SDL_Delay : word32 -> unit
 
   (* SDL_Surface *)
-  type SDL_Surface (= ptr)
+  type SDL_Surface = unit ptr (* SDL2_ttf で使うために定義を見せる *)
   type SDL_PixelFormat (= ptr)
   val SDL_Surface_GetFormat : SDL_Surface -> SDL_PixelFormat
 
   (* SDL_GetWindowSurface *)
   val SDL_GetWindowSurface : SDL_Window -> SDL_Surface
+
+  (* SDL_FreeSurface *)
+  val SDL_FreeSurface : SDL_Surface -> unit
 
   (* SDL_Rect *)
   type SDL_Rect =
@@ -95,8 +98,20 @@ struct
   (* SDL_UpdateWindowSurface *)
   val SDL_UpdateWindowSurface : SDL_Window -> unit
 
+  (* SDL_BlitSurface *)
+  val SDL_BlitSurface : SDL_Surface * SDL_Rect option * SDL_Surface * SDL_Rect option -> unit
+
   (* SDL_MapRGB *)
   val SDL_MapRGB : SDL_PixelFormat * word8 * word8 * word8 -> word32
+
+  (* SDL_Color *)
+  type SDL_Color =
+    {
+      r: word8,
+      g: word8,
+      b: word8,
+      a: word8
+    }
 
   (* SDL_Event *)
   datatype SDL_MouseButtonIndex =
@@ -232,4 +247,28 @@ struct
 
   (* SDL_RenderDrawPoint *)
   val SDL_RenderDrawPoint : SDL_Renderer * int * int -> unit
+
+  (* SDL_Texture *)
+  type SDL_Texture (= ptr)
+
+  (* SDL_CreateTextureFromSurface *)
+  val SDL_CreateTextureFromSurface : SDL_Renderer * SDL_Surface -> SDL_Texture
+
+  (* SDL_DestroyTexture *)
+  val SDL_DestroyTexture : SDL_Texture -> unit
+
+  (* SDL_RenderCopy *)
+  val SDL_RenderCopy : SDL_Renderer * SDL_Texture * SDL_Rect option * SDL_Rect option -> unit
+
+  (* SDL_QueryTextureResult *)
+  type SDL_QueryTextureResult =
+    {
+      format: word32,
+      access: int,
+      w: int,
+      h: int
+    }
+
+  (* SDL_QueryTexture *)
+  val SDL_QueryTexture : SDL_Texture -> SDL_QueryTextureResult
 end

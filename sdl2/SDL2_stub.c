@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
-SDL_Rect *stub_CreateRect(int x, int y, int w, int h) {
+SDL_Rect *CreateRect(int x, int y, int w, int h) {
   SDL_Rect *rect = malloc(sizeof(SDL_Rect));
   if (!rect) return NULL;
    
@@ -12,7 +13,7 @@ SDL_Rect *stub_CreateRect(int x, int y, int w, int h) {
   return rect;
 }
 
-void stub_DestroyRect(SDL_Rect *rect) {
+void DestroyRect(SDL_Rect *rect) {
   free(rect);
 }
 
@@ -20,7 +21,7 @@ const SDL_PixelFormat *SDL_Surface_GetFormat(const SDL_Surface *surface) {
   return surface->format;
 }
 
-SDL_Event *stub_SDL_PollEvent() {
+SDL_Event *SDL_PollEvent_wrapper() {
   SDL_Event *event = malloc(sizeof(SDL_Event));
   if (!event) return NULL;
 
@@ -32,11 +33,11 @@ SDL_Event *stub_SDL_PollEvent() {
   return event;
 }
 
-void stub_DestroyEvent(SDL_Event *event) {
+void DestroyEvent(SDL_Event *event) {
   free(event);
 }
 
-int SDL_Event_GetType(SDL_Event *event) {
+Uint32 SDL_Event_GetType(SDL_Event *event) {
   return event->type;
 }
 
@@ -58,4 +59,13 @@ int SDL_MouseButtonEvent_GetY(SDL_Event *event) {
 
 int SDL_MouseButtonEvent_GetButton(SDL_Event *event) {
   return event->button.button;
+}
+
+SDL_Surface *TTF_RenderUTF8_Solid_wrapper(TTF_Font *font, const char *text, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+  SDL_Color color;
+  color.r = r;
+  color.g = g;
+  color.b = b;
+  color.a = a;
+  return TTF_RenderUTF8_Solid(font, text, color);
 }
