@@ -16,6 +16,7 @@ struct
 
   val init : game
   val boardSize : int
+  val allPos : pos list
   val get : board -> pos -> color option
   val possible : board -> color -> pos list
   val step : game -> pos -> game option

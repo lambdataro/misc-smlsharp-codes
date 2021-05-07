@@ -1,4 +1,5 @@
 _require "basis.smi"
+_require "../qsort/MT.smi"
 _require "./Game.smi"
 
 structure Cpu =

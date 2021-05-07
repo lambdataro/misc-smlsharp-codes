@@ -1,6 +1,11 @@
 structure Cpu =
 struct
   fun cpuNext board color =
-    (* 置ける場所の一番先頭に置く *)
-    hd (Game.possible board Game.WHITE)
+    let
+      val possible = Game.possible board Game.WHITE
+      (* 置ける場所のどこかに置く *)
+      val idx = MT.genrand64_int64 () mod (Word64.fromInt (length possible))
+    in
+      List.nth (possible, Word64.toInt idx)
+    end
 end
