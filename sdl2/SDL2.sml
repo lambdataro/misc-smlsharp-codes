@@ -8,6 +8,11 @@ struct
   fun SDL_GetError () =
     Pointer.importString (SDL_GetError_stub ())
 
+  fun checkSuccess result =
+    if result = 0
+    then ()
+    else raise (SDL_Error (SDL_GetError ()))
+
   (* SDL_Init *)
   datatype SDL_InitFlags =
       SDL_INIT_TIMER
@@ -42,11 +47,7 @@ struct
               flags
           )
     in
-      if SDL_Init_stub flags = 0
-      then
-        ()
-      else
-        raise (SDL_Error (SDL_GetError ()))
+      checkSuccess (SDL_Init_stub flags)
     end
 
   (* SDL_Log *)
@@ -154,10 +155,13 @@ struct
         surface
     end
 
+  (* SDL_FreeSurface *)
+  val SDL_FreeSurface = _import "SDL_FreeSurface" : SDL_Surface -> ()
+
   (* SDL_Rect *)
   type SDL_Rect_c = unit ptr
-  val stub_CreateRect = _import "stub_CreateRect" : (int, int, int, int) -> SDL_Rect_c
-  val stub_DestroyRect = _import "stub_DestroyRect" : SDL_Rect_c -> ()
+  val CreateRect = _import "CreateRect" : (int, int, int, int) -> SDL_Rect_c
+  val DestroyRect = _import "DestroyRect" : SDL_Rect_c -> ()
 
   type SDL_Rect =
     {
@@ -167,39 +171,84 @@ struct
       h: int
     }
 
+  fun convert_SDL_Rect rectOpt =
+    case rectOpt of
+      NONE => Pointer.NULL ()
+    | SOME {x, y, w, h} => CreateRect (x, y, w, h)
+
   (* SDL_FillRect *)
   val SDL_FillRect_stub = _import "SDL_FillRect" : (SDL_Surface, SDL_Rect_c, word32) -> int
   fun SDL_FillRect (surface, rectOpt, color) =
     let
       val sdlRect_c =
-        case rectOpt of
-          NONE => Pointer.NULL ()
-        | SOME {x, y, w, h} => stub_CreateRect (x, y, w, h)
+        convert_SDL_Rect rectOpt
       val result =
         SDL_FillRect_stub (surface, sdlRect_c, color)
       val _ =
-        stub_DestroyRect sdlRect_c
+        DestroyRect sdlRect_c
     in
-      if result = 0
-      then ()
-      else raise (SDL_Error (SDL_GetError ()))
+      checkSuccess result
     end
 
   (* SDL_UpdateWindowSurface *)
   val SDL_UpdateWindowSurface_stub = _import "SDL_UpdateWindowSurface" : SDL_Window -> int
   fun SDL_UpdateWindowSurface window =
-    if SDL_UpdateWindowSurface_stub window = 0
-    then ()
-    else raise (SDL_Error (SDL_GetError ()))
+    checkSuccess (SDL_UpdateWindowSurface_stub window)
+
+  (* SDL_BlitSurface, リンク名は SDL_UpperBlit *)
+  val SDL_BlitSurface_stub = _import "SDL_UpperBlit" : (SDL_Surface, SDL_Rect_c, SDL_Surface, SDL_Rect_c) -> int
+  fun SDL_BlitSurface (src, srcRectOpt, dst, dstRectOpt) =
+    let
+      val srcRect = convert_SDL_Rect srcRectOpt
+      val dstRect = convert_SDL_Rect dstRectOpt
+    in
+      checkSuccess (SDL_BlitSurface_stub (src, srcRect, dst, dstRect))
+    end
 
   (* SDL_MapRGB *)
   val SDL_MapRGB = _import "SDL_MapRGB" : (SDL_PixelFormat, word8, word8, word8) -> word32
 
+  (* SDL_Color *)
+  type SDL_Color =
+    {
+      r: word8,
+      g: word8,
+      b: word8,
+      a: word8
+    }
+
   (* SDL_Event *)
   type SDL_Event_c = unit ptr
-  val stub_DestroyEvent = _import "stub_DestroyEvent" : SDL_Event_c -> ()
+  val DestroyEvent = _import "DestroyEvent" : SDL_Event_c -> ()
   val SDL_Event_GetType = _import "SDL_Event_GetType" : SDL_Event_c -> int
 
+  datatype SDL_MouseButtonIndex =
+      SDL_BUTTON_LEFT
+    | SDL_BUTTON_MIDDLE
+    | SDL_BUTTON_RIGHT
+    | SDL_BUTTON_X1
+    | SDL_BUTTON_X2
+
+  type SDL_MouseMotionEvent =
+    {
+      x: int,
+      y: int
+    }
+
+  val SDL_MouseMotionEvent_GetX = _import "SDL_MouseMotionEvent_GetX" : SDL_Event_c -> int
+  val SDL_MouseMotionEvent_GetY = _import "SDL_MouseMotionEvent_GetY" : SDL_Event_c -> int
+
+  type SDL_MouseButtonEvent =
+    {
+      button: SDL_MouseButtonIndex,
+      x: int,
+      y: int
+    }
+  
+  val SDL_MouseButtonEvent_GetX = _import "SDL_MouseButtonEvent_GetX" : SDL_Event_c -> int
+  val SDL_MouseButtonEvent_GetY = _import "SDL_MouseButtonEvent_GetY" : SDL_Event_c -> int
+  val SDL_MouseButtonEvent_GetButton = _import "SDL_MouseButtonEvent_GetButton" : SDL_Event_c -> int
+ 
   datatype SDL_Event =
       SDL_QUIT
     (* iOS evnets *)
@@ -222,9 +271,9 @@ struct
     | SDL_TEXTINPUT
     | SDL_KEYMAPCHANGED
     (* Mouse events *)
-    | SDL_MOUSEMOTION
-    | SDL_MOUSEBUTTONDOWN
-    | SDL_MOUSEBUTTONUP
+    | SDL_MOUSEMOTION of SDL_MouseMotionEvent
+    | SDL_MOUSEBUTTONDOWN of SDL_MouseButtonEvent
+    | SDL_MOUSEBUTTONUP of SDL_MouseButtonEvent
     | SDL_MOUSEWHEEL
     (* Joystick events *)
     | SDL_JOYAXISMOTION
@@ -272,10 +321,10 @@ struct
     | SDL_USEREVENT
 
   (* SDL_PollEvent *)
-  val stub_SDL_PollEvent = _import "stub_SDL_PollEvent" : () -> SDL_Event_c
+  val SDL_PollEvent_wrapper = _import "SDL_PollEvent_wrapper" : () -> SDL_Event_c
   fun SDL_PollEvent () =
     let
-      val event_c = stub_SDL_PollEvent ()
+      val event_c = SDL_PollEvent_wrapper ()
     in
       if Pointer.isNull event_c
       then NONE
@@ -305,8 +354,32 @@ struct
               | 772 => SDL_KEYMAPCHANGED
               (* Mouse events *)
               | 1024 => SDL_MOUSEMOTION
+                {
+                  x = SDL_MouseMotionEvent_GetX event_c,
+                  y = SDL_MouseMotionEvent_GetY event_c
+                }
               | 1025 => SDL_MOUSEBUTTONDOWN
+                {
+                  button = case SDL_MouseButtonEvent_GetButton event_c of
+                      1 => SDL_BUTTON_LEFT
+                    | 2 => SDL_BUTTON_MIDDLE
+                    | 3 => SDL_BUTTON_RIGHT
+                    | 4 => SDL_BUTTON_X1
+                    | _ => SDL_BUTTON_X2,
+                  x = SDL_MouseButtonEvent_GetX event_c,
+                  y = SDL_MouseButtonEvent_GetY event_c
+                }
               | 1026 => SDL_MOUSEBUTTONUP
+                {
+                  button = case SDL_MouseButtonEvent_GetButton event_c of
+                      1 => SDL_BUTTON_LEFT
+                    | 2 => SDL_BUTTON_MIDDLE
+                    | 3 => SDL_BUTTON_RIGHT
+                    | 4 => SDL_BUTTON_X1
+                    | _ => SDL_BUTTON_X2,
+                  x = SDL_MouseButtonEvent_GetX event_c,
+                  y = SDL_MouseButtonEvent_GetY event_c
+                }
               | 1027 => SDL_MOUSEWHEEL
               (* Joystick events *)
               | 1536 => SDL_JOYAXISMOTION
@@ -355,9 +428,166 @@ struct
               (* otherwise *)
               | _ =>
                 raise (SDL_Error "unknown SDL event")
-          val _ = stub_DestroyEvent event_c
+          val _ = DestroyEvent event_c
         in
           SOME event
         end
+    end
+
+  (* SDL_Renderer *)
+  type SDL_Renderer = unit ptr
+
+  (* SDL_RendererFlags *)
+  datatype SDL_RendererFlags =
+      SDL_RENDERER_SOFTWARE
+    | SDL_RENDERER_ACCELERATED
+    | SDL_RENDERER_PRESENTVSYNC
+    | SDL_RENDERER_TARGETTEXTURE
+
+  (* SDL_CreateRenderer *)
+  val SDL_CreateRenderer_stub = _import "SDL_CreateRenderer" : (SDL_Window, int, word32) -> SDL_Renderer
+  fun SDL_CreateRenderer (window, index, flags) =
+    let
+      val flags =
+        foldl Word32.orb 0wx0
+          (
+            map
+              (fn SDL_RENDERER_SOFTWARE => 0wx00000001
+                | SDL_RENDERER_ACCELERATED => 0wx00000002
+                | SDL_RENDERER_PRESENTVSYNC => 0wx00000004
+                | SDL_RENDERER_TARGETTEXTURE => 0wx00000008
+              )
+              flags
+          )
+      val renderer = SDL_CreateRenderer_stub (window, index, flags)
+    in
+      if Pointer.isNull renderer
+      then
+        raise (SDL_Error (SDL_GetError ()))
+      else
+        renderer
+    end
+
+  (* SDL_GetRenderer *)
+  val SDL_GetRenderer_stub = _import "SDL_GetRenderer" : SDL_Window -> SDL_Renderer
+  fun SDL_GetRenderer window =
+    let
+      val renderer = SDL_GetRenderer_stub window
+    in
+      if Pointer.isNull renderer then
+        raise (SDL_Error (SDL_GetError ()))
+      else
+        renderer
+    end
+
+  (* SDL_DestroyRenderer *)
+  val SDL_DestroyRenderer = _import "SDL_DestroyRenderer" : SDL_Renderer -> ()
+
+  (* SDL_SetRenderDrawColor *)
+  val SDL_SetRenderDrawColor_stub = _import "SDL_SetRenderDrawColor" : (SDL_Renderer, word8, word8, word8, word8) -> int
+  fun SDL_SetRenderDrawColor (renderer, r, g, b, a) =
+    checkSuccess (SDL_SetRenderDrawColor_stub (renderer, r, g, b, a))
+
+  (* SDL_RenderClear *)
+  val SDL_RenderClear_stub = _import "SDL_RenderClear" : SDL_Renderer -> int
+  fun SDL_RenderClear renderer =
+    checkSuccess (SDL_RenderClear_stub renderer)
+
+  (* SDL_RenderPresent *)
+  val SDL_RenderPresent = _import "SDL_RenderPresent" : SDL_Renderer -> ()
+
+  (* SDL_RenderDrawRect *)
+  val SDL_RenderDrawRect_stub = _import "SDL_RenderDrawRect" : (SDL_Renderer, SDL_Rect_c) -> int
+  fun SDL_RenderDrawRect (renderer, rectOpt) =
+    let
+      val sdlRect_c =
+        convert_SDL_Rect rectOpt
+      val result =
+        SDL_RenderDrawRect_stub (renderer, sdlRect_c)
+      val _ =
+        DestroyRect sdlRect_c
+    in
+      checkSuccess result
+    end
+
+  (* SDL_RenderFillRect *)
+  val SDL_RenderFillRect_stub = _import "SDL_RenderFillRect" : (SDL_Renderer, SDL_Rect_c) -> int
+  fun SDL_RenderFillRect (renderer, rectOpt) =
+    let
+      val sdlRect_c =
+        convert_SDL_Rect rectOpt
+      val result =
+        SDL_RenderFillRect_stub (renderer, sdlRect_c)
+      val _ =
+        DestroyRect sdlRect_c
+    in
+      checkSuccess result
+    end
+
+  (* SDL_RenderDrawLine *)
+  val SDL_RenderDrawLine_stub = _import "SDL_RenderDrawLine" : (SDL_Renderer, int, int, int, int) -> int
+  fun SDL_RenderDrawLine (renderer, x1, y1, x2, y2) =
+    checkSuccess (SDL_RenderDrawLine_stub (renderer, x1, y1, x2, y2))
+
+  (* SDL_RenderDrawPoint *)
+  val SDL_RenderDrawPoint_stub = _import "SDL_RenderDrawPoint" : (SDL_Renderer, int, int) -> int
+  fun SDL_RenderDrawPoint (renderer, x, y) =
+    checkSuccess (SDL_RenderDrawPoint_stub (renderer, x, y))
+
+  (* SDL_Texture *)
+  type SDL_Texture = unit ptr
+
+  (* SDL_CreateTextureFromSurface *)
+  val SDL_CreateTextureFromSurface_stub = _import "SDL_CreateTextureFromSurface" : (SDL_Renderer, SDL_Surface) -> SDL_Texture
+  fun SDL_CreateTextureFromSurface (renderer, surface) =
+    let
+      val texture = SDL_CreateTextureFromSurface_stub (renderer, surface)
+    in
+      if Pointer.isNull texture then
+        raise (SDL_Error (SDL_GetError ()))
+      else
+        texture
+    end
+
+  (* SDL_DestroyTexture *)
+  val SDL_DestroyTexture = _import "SDL_DestroyTexture" : SDL_Texture -> ()
+
+  (* SDL_RenderCopy *)
+  val SDL_RenderCopy_stub = _import "SDL_RenderCopy" : (SDL_Renderer, SDL_Texture, SDL_Rect_c, SDL_Rect_c) -> int
+  fun SDL_RenderCopy (renderer, texture, srcRectOpt, dstRectOpt) =
+    let
+      val srcRect = convert_SDL_Rect srcRectOpt
+      val dstRect = convert_SDL_Rect dstRectOpt
+    in
+      checkSuccess (SDL_RenderCopy_stub (renderer, texture, srcRect, dstRect))
+    end
+
+  (* SDL_QueryTextureResult *)
+  type SDL_QueryTextureResult =
+    {
+      format: word32,
+      access: int,
+      w: int,
+      h: int
+    }
+
+  (* SDL_QueryTexture *)
+  val SDL_QueryTexture_stub = _import "SDL_QueryTexture" : (SDL_Texture, word32 ref, int ref, int ref, int ref) -> int
+  fun SDL_QueryTexture texture =
+    let
+      val format = ref 0w0
+      val access = ref 0
+      val w = ref 0
+      val h = ref 0
+    in
+      if SDL_QueryTexture_stub (texture, format, access, w, h) = 0 then
+        {
+          format = !format,
+          access = !access,
+          w = !w,
+          h = !h
+        }
+      else
+        raise (SDL_Error (SDL_GetError ()))
     end
 end
