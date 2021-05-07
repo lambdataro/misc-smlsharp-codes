@@ -73,7 +73,7 @@ struct
   val SDL_Delay : word32 -> unit
 
   (* SDL_Surface *)
-  type SDL_Surface = unit ptr (* SDL2_ttf で使うために定義を見せる *)
+  type SDL_Surface = unit ptr (* SDL2_ttf で使うために定義を公開 *)
   type SDL_PixelFormat (= ptr)
   val SDL_Surface_GetFormat : SDL_Surface -> SDL_PixelFormat
 
@@ -209,7 +209,7 @@ struct
   val SDL_PollEvent : unit -> SDL_Event option
 
   (* SDL_Renderer *)
-  type SDL_Renderer (= ptr)
+  type SDL_Renderer = unit ptr (* SDL2_gfx で使うために定義を公開 *)
 
   (* SDL_RendererFlags *)
   datatype SDL_RendererFlags =
