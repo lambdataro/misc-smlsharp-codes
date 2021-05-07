@@ -23,3 +23,9 @@ Rendererを使って描画する。
 SDL_ttfを使って文字列を描く。
 
 ![Test04 Capture](img/Test04_capture.png)
+
+## Test05
+
+SDL_gfxを使って描いた円が画面内でアニメーションする。
+
+![Test04 Capture](img/Test05_capture.png)

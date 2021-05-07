@@ -1,0 +1,3 @@
+_require "basis.smi"
+_require "./SDL2.smi"
+_require "./SDL2_gfx.smi"

@@ -1,0 +1,17 @@
+_require "basis.smi"
+_require "ffi.smi"
+_require "./SDL2.smi"
+
+structure SDL2_gfx =
+struct
+  val circleRGBA : SDL2.SDL_Renderer * int * int * int * word8 * word8 * word8 * word8 -> unit
+  val filledCircleRGBA : SDL2.SDL_Renderer * int * int * int * word8 * word8 * word8 * word8 -> unit
+  val ellipseRGBA : SDL2.SDL_Renderer * int * int * int * int * word8 * word8 * word8 * word8 -> unit
+  val filledEllipseRGBA : SDL2.SDL_Renderer * int * int * int * int * word8 * word8 * word8 * word8 -> unit
+
+  type FPSmanager (= ptr)
+  val SDL_initFramerate : unit -> FPSmanager
+  val DestroyFPSManager : FPSmanager -> unit
+  val SDL_setFramerate : FPSmanager * word32 -> unit
+  val SDL_framerateDelay : FPSmanager -> word32
+end

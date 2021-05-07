@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL2_framerate.h>
 
 SDL_Rect *CreateRect(int x, int y, int w, int h) {
   SDL_Rect *rect = malloc(sizeof(SDL_Rect));
@@ -68,4 +69,15 @@ SDL_Surface *TTF_RenderUTF8_Solid_wrapper(TTF_Font *font, const char *text, Uint
   color.b = b;
   color.a = a;
   return TTF_RenderUTF8_Solid(font, text, color);
+}
+
+FPSmanager *SDL_initFramerate_wrapper() {
+  FPSmanager *manager = malloc(sizeof(FPSmanager));
+  if (!manager) return NULL;
+  SDL_initFramerate(manager);
+  return manager;
+}
+
+void DestroyFPSManager(FPSmanager *manager) {
+  free(manager);
 }
