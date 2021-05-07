@@ -1,0 +1,6 @@
+_require "basis.smi"
+_require "./Game.smi"
+_require "./Cpu.smi"
+_require "../../sdl2/SDL2.smi"
+_require "../../sdl2/SDL2_ttf.smi"
+_require "../../sdl2/SDL2_gfx.smi"

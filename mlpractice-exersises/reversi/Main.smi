@@ -1,0 +1,3 @@
+_require "basis.smi"
+_require "./Game.smi"
+_require "./Cpu.smi"
