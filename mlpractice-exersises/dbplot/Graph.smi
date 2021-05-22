@@ -1,0 +1,9 @@
+_require "basis.smi"
+_require "reify.smi"
+_require "./Draw.smi"
+
+structure Graph =
+struct
+  val plot : {x:real, y:real} list -> Draw.obj list
+  val plotHistogram : {x:real} list -> Draw.obj list
+end
