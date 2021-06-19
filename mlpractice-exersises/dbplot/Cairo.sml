@@ -29,6 +29,15 @@ struct
   
   fun cairo_pdf_surface_create arg =
     checkSurface (cairo_pdf_surface_create_ORIG arg)
+
+  val cairo_image_surface_create_ORIG =
+    _import "cairo_image_surface_create": (string, int, int) -> cairo_surface_t
+  
+  fun cairo_image_surface_create arg =
+    checkSurface (cairo_image_surface_create_ORIG arg)
+
+  val cairo_image_surface_get_data =
+    _import "cairo_image_surface_get_data" : cairo_surface_t -> word8 ptr
   
   type cairo_t = unit ptr
 

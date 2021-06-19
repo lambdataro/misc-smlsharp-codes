@@ -6,6 +6,8 @@ struct
   exception Error of string
   type cairo_surface_t (= ptr)
   val cairo_pdf_surface_create : string * real * real -> cairo_surface_t
+  val cairo_image_surface_create : string * int * int -> cairo_surface_t
+  val cairo_image_surface_get_data : cairo_surface_t -> word8 ptr
   val cairo_surface_destroy : cairo_surface_t -> unit
   type cairo_t (= ptr)
   val cairo_create : cairo_surface_t -> cairo_t
